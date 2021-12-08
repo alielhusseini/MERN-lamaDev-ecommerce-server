@@ -1,8 +1,10 @@
+// imports
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
 require('dotenv/config')
 
+//setup
 const app = express()
 const port = process.env.PORT || 5000
 mongoose.connect(process.env.CONNECTION_URL)
@@ -12,6 +14,7 @@ mongoose.connect(process.env.CONNECTION_URL)
 app.use(cors())
 app.use(express.json())
 
+// routes
 app.use("/api/auth", require("./routes/authRoute"));
 app.use("/api/users", require("./routes/userRoute"));
 app.use("/api/products", require("./routes/productRoute"));

@@ -7,19 +7,12 @@ const {
 const router = require("express").Router();
 
 //UPDATE
-router.put("/:id", verifyTokenAndAuthorization, async(req, res) => {
-    if (req.body.password) {
-        req.body.password = CryptoJS.AES.encrypt(
-            req.body.password,
-            process.env.PASSWORD
-        ).toString();
-    }
+router.put("/:id", verifyTokenAndAuthorization, async(req, res) => { // firstly decide whether the token belongs to an admin or client in the middelware
+    if (req.body.password) req.body.password = CryptoJS.AES.encrypt(req.body.password, process.env.PASSWORD).toString();
 
     try {
         const updatedUser = await User.findByIdAndUpdate(
-            req.params.id, {
-                $set: req.body,
-            }, { new: true }
+            req.params.id, { $set: req.body, }, { new: true }
         );
         res.status(200).json(updatedUser);
     } catch (err) {
@@ -38,7 +31,7 @@ router.delete("/:id", verifyTokenAndAuthorization, async(req, res) => {
 });
 
 //GET USER
-router.get("/find/:id", verifyTokenAndAdmin, async(req, res) => {
+router.get("/find/:id", verifyTokenAndAdmin, async(req, res) => { // only admins can get any user
     try {
         const user = await User.findById(req.params.id);
         const { password, ...others } = user._doc;
