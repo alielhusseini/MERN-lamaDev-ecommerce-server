@@ -1,9 +1,5 @@
 const User = require("../models/UserModel");
-const {
-    verifyToken,
-    verifyTokenAndAuthorization,
-    verifyTokenAndAdmin,
-} = require("./verifyToken");
+const { verifyToken, verifyTokenAndAuthorization, verifyTokenAndAdmin, } = require("./verifyToken");
 const router = require("express").Router();
 
 //UPDATE
@@ -43,11 +39,9 @@ router.get("/find/:id", verifyTokenAndAdmin, async(req, res) => { // only admins
 
 //GET ALL USER
 router.get("/", verifyTokenAndAdmin, async(req, res) => {
-    const query = req.query.new;
+    const query = req.query.new; // for getting latest 5 users
     try {
-        const users = query ?
-            await User.find().sort({ _id: -1 }).limit(5) :
-            await User.find();
+        const users = query ? await User.find().sort({ _id: -1 }).limit(5) : await User.find();
         res.status(200).json(users);
     } catch (err) {
         res.status(500).json(err);
@@ -55,27 +49,25 @@ router.get("/", verifyTokenAndAdmin, async(req, res) => {
 });
 
 //GET USER STATS
-router.get("/stats", verifyTokenAndAdmin, async(req, res) => {
+router.get("/stats", verifyTokenAndAdmin, async(req, res) => { // total number of users/month
     const date = new Date();
-    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
+    const lastYear = new Date(date.setFullYear(date.getFullYear() - 1)); // will return last year today
 
     try {
-        const data = await User.aggregate([{
-                $match: {
-                    createdAt: {
-                        $gte: lastYear
-                    }
+        const data = await User.aggregate([{ // for grouping multiple docs together
+                $match: { // matching all users from last year till this day from the createdAt property
+                    createdAt: { $gte: lastYear } // { $match: { status: "urgent" } }
                 }
             },
             {
                 $project: {
-                    month: { $month: "$createdAt" },
+                    month: { $month: "$createdAt" }, // created the month variable since we want to group users by month ---> $month: "$createdAt" will return the month(as index) in the createdAt property which we'll use in $group
                 },
             },
             {
-                $group: {
-                    _id: "$month",
-                    total: { $sum: 1 },
+                $group: { // for grouping users by month variable assigned above (it should be unique)
+                    _id: "$month", // grouping by what: by month that is created above
+                    total: { $sum: 1 }, // adding the total number of users
                 },
             },
         ]);
