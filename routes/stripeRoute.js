@@ -3,7 +3,7 @@ const stripe = require("stripe")(process.env.STRIPE_KEY);
 
 router.post("/payment", (req, res) => {
     stripe.charges.create({
-            source: req.body.tokenId, // when we make a payment stripe will return a tokenId
+            source: req.body.tokenId, // when we make a payment stripe will return a tokenId from the frontend
             amount: req.body.amount,
             currency: "usd",
         },
