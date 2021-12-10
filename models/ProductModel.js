@@ -5,9 +5,10 @@ const ProductSchema = new Schema({
     desc: { type: String, required: true, },
     img: { type: String, required: true },
     categories: { type: [String] },
-    size: { type: String },
-    color: { type: String },
+    size: { type: [String] },
+    color: { type: [String] },
     price: { type: Number, required: true },
+    inStock: { type: Boolean, default: true }
 }, { timestamps: true });
 
 module.exports = model("ProductecoSchema", ProductSchema);
